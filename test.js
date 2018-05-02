@@ -65,3 +65,4 @@ elementSets.map(function (elem, index) {
     document.body.appendChild(elem.button);
     document.body.appendChild(elem.div);
 });
+//# sourceMappingURL=test.js.map
