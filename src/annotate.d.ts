@@ -1,4 +1,4 @@
-import { Selector } from './selector'
+import { Selector } from './srcselectors'
 
 export interface Annotation {
   "@context": string,
