@@ -6,6 +6,7 @@ export class TextPositionSelector extends Selector {
   end: number;
 
   fromRange(range: Range): Selection {
+    this.range = range;
     let nodeIterator = document.createNodeIterator(document.body, NodeFilter.SHOW_TEXT);
     let node: Node;
     let offset: number = 0;

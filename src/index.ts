@@ -1,6 +1,7 @@
 import { annotations } from './db'
-import { TextPositionSelector } from './selectors'
+import { Selection, TextPositionSelector } from './selectors'
 import { XPathSelector } from './selectors/xpath-selector';
+import { Annotator } from './annotator';
 
 
 let range: Range;
@@ -24,13 +25,14 @@ function highlight(range: Range): boolean {
 let btn = document.getElementById("button");
 btn.addEventListener("click", (e:Event) => highlight(range));
 
-for (let i = 0; i < 6; i++) {
+let annotator = new Annotator();
+for (let i = 0; i < annotations.length; i++) {
   let annotation = (<any>annotations)[i];
-  let start: number = <any>annotation.target[0].selector[1].start;
-  let end: number = <any>annotation.target[0].selector[1].end;
-  let selector = new TextPositionSelector({start: start, end: end});
-  let range = selector.getRange();
-  let selection = document.createElement('span');
-  selection.style.backgroundColor = 'blue';
-  range.surroundContents(selection);
+  // let start: number = <any>annotation.target[0].selector[1].start;
+  // let end: number = <any>annotation.target[0].selector[1].end;
+  // let selection: Selection = { start: start, end: end };
+  let selection = <any>annotation.target[0].selector[0];
+  annotator.annotate(selection);
 }
+
+console.log(annotator.annotations);
