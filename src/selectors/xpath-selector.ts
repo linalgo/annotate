@@ -24,7 +24,8 @@ export class XPathSelector extends Selector {
     let range = document.createRange();
     range.setStart(findNode(this.startContainer), this.startOffset);
     range.setEnd(findNode(this.endContainer), this.endOffset);
-    return range;
+    this.range = range;
+    return this.range;
   }
 
   getSelection(): Selection {
@@ -63,10 +64,10 @@ function getPathTo(node: Node, fromNode: Node = document.rootElement): string {
     path = `${nodeName(node)}[${nodePosition(node)}]/${path}`;
     node = node.parentNode;
   }
-  return path;
+  return `//${path}`;
 }
 
 function findNode(path: string): Node {
-  let r = document.evaluate(path, document, null, XPathResult.ANY_TYPE, null)
-  return r.singleNodeValue
+  let query = document.evaluate(path, document, null, XPathResult.ANY_UNORDERED_NODE_TYPE, null)
+  return query.singleNodeValue
 }
