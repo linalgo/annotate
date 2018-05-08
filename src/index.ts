@@ -1,5 +1,6 @@
-import { TextPositionSelector } from './selector'
 import { annotations } from './db'
+import { TextPositionSelector } from './selectors'
+import { XPathSelector } from './selectors/xpath-selector';
 
 
 let range: Range;
@@ -9,9 +10,11 @@ document.addEventListener("selectionchange", function() {
 });
 
 function highlight(range: Range): boolean {
+  let textSelector = new TextPositionSelector(range);
+  let xpathSelector = new XPathSelector(range);
   console.log(range);
-  let selector = new TextPositionSelector(range);
-  console.log(selector.toString());
+  console.log(textSelector);
+  console.log(xpathSelector);
   const s = document.createElement('span');
   s.style.backgroundColor = 'yellow';
   range.surroundContents(s);

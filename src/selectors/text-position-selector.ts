@@ -1,37 +1,11 @@
-interface Selection {
-  start: number,
-  end: number
-}
-
-export class Selector {
-  range: Range;
-
-  constructor(rs?: Range | Selection){
-    if (rs instanceof Range) {
-      this.range = rs;
-    }
-  }
-}
-
-function isSelection(obj: any): obj is Selection {
-  return (obj.start && obj.end);
-}
+import { isSelection, Selection, Selector } from './selector'
 
 export class TextPositionSelector extends Selector {
 
   start: number;
   end: number;
 
-  constructor(rs?: Range | Selection) {
-    super(rs);
-    if (rs instanceof Range) {
-      this.fromRange(rs);
-    } else if (isSelection(rs)) {
-      this.fromSelection(rs);
-    }
-  }
-
-  fromRange(range: Range): Selector {
+  fromRange(range: Range): Selection {
     let nodeIterator = document.createNodeIterator(document.body, NodeFilter.SHOW_TEXT);
     let node: Node;
     let offset: number = 0;
@@ -44,7 +18,7 @@ export class TextPositionSelector extends Selector {
       }
       offset += node.nodeValue.length;
     }
-    return this;
+    return this.getSelection();
   }
 
   fromSelection(selection: Selection): Range {
