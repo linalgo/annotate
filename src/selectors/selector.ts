@@ -1,21 +1,30 @@
+import { Annotation, isAnnotation } from '../annotator'
+
 export interface Selection {
+  type?: string;
   startContainer?: string,
   endContainer?: string,
   startOffset?: number,
   endOffset?: number,
   start?: number,
-  end?: number
+  end?: number,
+  exact?: string,
+  prefix?: string,
+  suffix?: string
 }
 
 export function isSelection(obj: any): obj is Selection {
-  if (obj.start && obj.end) {
+  if (obj.type) {
     return true;
-  } else if (obj.startContainer && obj.endContainer && obj.startOffset && obj.endOffset) {
-    return true;
-  } else {
-    return false;
   }
+  return false;
 }
+
+export interface SelectorType {
+  type: string;
+  selection: Selection;
+}
+
 export abstract class Selector {
   range: Range;
 
