@@ -1,3 +1,6 @@
+export * from './annotators';
+export * from './selectors';
+
 import { Annotator } from './annotators/annotator';
 
 let range: Range;
