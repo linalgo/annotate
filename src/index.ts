@@ -1,31 +1,15 @@
-import { Annotation, Annotator } from './annotator';
-import { Selection, TextPositionSelector } from './selectors'
-import { XPathSelector } from './selectors/xpath-selector';
-
-import { annotations } from './annotations'
-
+import { Annotator } from './annotators/annotator';
 
 let range: Range;
-document.addEventListener("selectionchange", function() {
+document.addEventListener('selectionchange', function() {
   let selection = window.getSelection();
   range = selection.getRangeAt(0);
 });
 
-function highlight(range: Range): boolean {
-  let textSelector = new TextPositionSelector(range);
-  let xpathSelector = new XPathSelector(range);
-  console.log(range);
-  console.log(textSelector);
-  console.log(xpathSelector);
-  const s = document.createElement('span');
-  s.style.backgroundColor = 'yellow';
-  range.surroundContents(s);
-  return true;
+function highlight(range: Range) {
+  const annotator = new Annotator();
+  annotator.annotate(range);
 }
 
-let btn = document.getElementById("button");
-btn.addEventListener("click", (e:Event) => highlight(range));
-
-let annotator = new Annotator(annotations);
-
-console.log(annotator.annotations);
+let btn = document.getElementById('button');
+btn.addEventListener('click', (e: Event) => highlight(range));

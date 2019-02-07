@@ -1,28 +1,28 @@
-import { isSelection, Selection, Selector } from './selector'
+import { Selection, TextPositionSelection } from './selection'
+import { Selector } from './selector'
 
 export class TextPositionSelector extends Selector {
 
-  start: number;
-  end: number;
-
-  fromRange(range: Range): Selection {
+  selectionFromRange(range: Range): Selection {
     this.range = range;
     let nodeIterator = document.createNodeIterator(document.body, NodeFilter.SHOW_TEXT);
     let node: Node;
     let offset: number = 0;
+    let selection: TextPositionSelection;
     while (node = nodeIterator.nextNode()) {
       if (node === range.startContainer) {
-        this.start = offset + range.startOffset;
+        selection.start = offset + range.startOffset;
       }
       if (node === range.endContainer) {
-        this.end = offset + range.endOffset;
+        selection.end = offset + range.endOffset;
       }
       offset += node.nodeValue.length;
     }
-    return this.getSelection();
+    this.selection = selection;
+    return this.selection;
   }
 
-  fromSelection(selection: Selection): Range {
+  rangeFromSelection(selection: TextPositionSelection): Range {
     let startContainer: Node, endContainer: Node;
     let startOffset: number, endOffset: number;
     let nodeIterator = document.createNodeIterator(document.body, NodeFilter.SHOW_TEXT);
@@ -49,14 +49,7 @@ export class TextPositionSelector extends Selector {
   }
 
   toString(): string {
-    return `start: ${this.start}, end: ${this.end}`;
+    return `start: ${(this.selection as TextPositionSelection).start}, end: ${(this.selection as TextPositionSelection).end}`;
   }
 
-  getRange(): Range {
-    return this.range;
-  }
-
-  getSelection(): Selection {
-    return { start: this.start, end: this.end }
-  }
 }

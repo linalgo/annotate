@@ -1,4 +1,5 @@
-import { Selection, Selector } from './selector'
+import { Selection } from './selection';
+import { Selector } from './selector'
 
 export class XPathSelector extends Selector {
 
@@ -7,38 +8,23 @@ export class XPathSelector extends Selector {
   startOffset: number;
   endOffset: number;
 
-  fromRange(range: Range): Selection {
+  selectionFromRange(range: Range): Selection {
     this.range = range;
-    this.startContainer = getPathTo(range.startContainer);
-    this.endContainer = getPathTo(range.endContainer);
-    this.startOffset = range.startOffset;
-    this.endOffset = range.endOffset;
-    return this.getSelection();
+    this.selection = {
+      startContainer: getPathTo(range.startContainer),
+      endContainer: getPathTo(range.endContainer),
+      startOffset: range.startOffset,
+      endOffset: range.endOffset
+    }
+    return this.selection;
   }
 
-  fromSelection(selection: Selection): Range {
-    this.startContainer = selection.startContainer;
-    this.endContainer = selection.endContainer;
-    this.startOffset = selection.startOffset;
-    this.endOffset = selection.endOffset;
+  rangeFromSelection(selection: Selection): Range {
+    this.selection = selection
     let range = document.createRange();
     range.setStart(findNode(this.startContainer), this.startOffset);
     range.setEnd(findNode(this.endContainer), this.endOffset);
     this.range = range;
-    return this.range;
-  }
-
-  getSelection(): Selection {
-    let selection: Selection = {
-      startContainer: this.startContainer,
-      endContainer: this.endContainer,
-      startOffset: this.startOffset,
-      endOffset: this.endOffset
-    }
-    return selection;
-  }
-
-  getRange(): Range {
     return this.range;
   }
 }
@@ -50,7 +36,7 @@ function nodeName(node: Node): string {
 function nodePosition(node: Node): number {
   let name = node.nodeName;
   let position = 1;
-  while(node = node.previousSibling) {
+  while (node = node.previousSibling) {
     if (name === node.nodeName) {
       position += 1;
     }
@@ -58,7 +44,7 @@ function nodePosition(node: Node): number {
   return position;
 }
 
-function getPathTo(node: Node, fromNode: Node = document.rootElement): string {
+function getPathTo(node: Node, fromNode: Node = (document as any).rootElement): string {
   let path = '';
   while (node !== fromNode) {
     path = `${nodeName(node)}[${nodePosition(node)}]/${path}`;
