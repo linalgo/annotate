@@ -1,4 +1,4 @@
-import { Annotation } from './annotator'
+import { Annotation } from './annotators';
 
 export const annotations: Array<Annotation> = [
   {

@@ -1,2 +1,4 @@
-export { Selection, Selector } from './selector';
-export { TextPositionSelector } from './text-position-selector'
+export * from './selection';
+export * from './selector';
+export * from './text-position-selector';
+export * from './xpath-selector'

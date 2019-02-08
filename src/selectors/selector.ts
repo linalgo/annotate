@@ -1,44 +1,19 @@
-import { Annotation, isAnnotation } from '../annotator'
+import { Selection, isSelection } from './selection';
 
-export interface Selection {
-  type?: string;
-  startContainer?: string,
-  endContainer?: string,
-  startOffset?: number,
-  endOffset?: number,
-  start?: number,
-  end?: number,
-  exact?: string,
-  prefix?: string,
-  suffix?: string
-}
-
-export function isSelection(obj: any): obj is Selection {
-  if (obj.type) {
-    return true;
-  }
-  return false;
-}
-
-export interface SelectorType {
-  type: string;
-  selection: Selection;
-}
 
 export abstract class Selector {
   range: Range;
+  selection: Selection;
 
   constructor(rs?: Range | Selection) {
     if (rs instanceof Range) {
-      this.fromRange(rs);
+      this.selectionFromRange(rs);
     } else if (isSelection(rs)) {
-      this.fromSelection(rs);
+      this.rangeFromSelection(rs);
     }
   }
 
-  abstract fromRange(range: Range): Selection;
-  abstract fromSelection(selection: Selection): Range;
-  abstract getRange(): Range;
-  abstract getSelection(): Selection;
+  abstract selectionFromRange(range: Range): Selection;
+  abstract rangeFromSelection(selection: Selection): Range;
 
 }
