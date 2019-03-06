@@ -1,14 +1,9 @@
-import { Selection } from './selection';
+import { Selection, XPathSelection } from './selection';
 import { Selector } from './selector'
 
 export class XPathSelector extends Selector {
 
-  startContainer: string;
-  endContainer: string;
-  startOffset: number;
-  endOffset: number;
-
-  selectionFromRange(range: Range): Selection {
+  selectionFromRange(range: Range): XPathSelection {
     this.range = range;
     this.selection = {
       startContainer: getPathTo(range.startContainer),
@@ -19,17 +14,20 @@ export class XPathSelector extends Selector {
     return this.selection;
   }
 
-  rangeFromSelection(selection: Selection): Range {
+  rangeFromSelection(selection: XPathSelection): Range {
     this.selection = selection
     let range = document.createRange();
-    range.setStart(findNode(this.startContainer), this.startOffset);
-    range.setEnd(findNode(this.endContainer), this.endOffset);
+    range.setStart(findNode(selection.startContainer), selection.startOffset);
+    range.setEnd(findNode(selection.endContainer), selection.endOffset);
     this.range = range;
     return this.range;
   }
 }
 
 function nodeName(node: Node): string {
+  if (node.nodeType === Node.TEXT_NODE) {
+    return 'text()';
+  }
   return node.nodeName.replace('#', '').toLowerCase();
 }
 
@@ -44,13 +42,13 @@ function nodePosition(node: Node): number {
   return position;
 }
 
-function getPathTo(node: Node, fromNode: Node = (document as any).rootElement): string {
+function getPathTo(node: Node, fromNode: Node = document): string {
   let path = '';
   while (node !== fromNode) {
-    path = `${nodeName(node)}[${nodePosition(node)}]/${path}`;
+    path = `/${nodeName(node)}[${nodePosition(node)}]${path}`;
     node = node.parentNode;
   }
-  return `//${path}`;
+  return `/${path}`;
 }
 
 function findNode(path: string): Node {

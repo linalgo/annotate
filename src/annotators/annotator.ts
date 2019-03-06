@@ -9,11 +9,7 @@ export class Annotator {
 
   annotations: Array<Annotation> = [];
 
-  constructor(annotations: Annotation[] = []) {
-    for (const annotation of annotations) {
-      this.annotate(annotation.target.selector[1]);
-    }
-  }
+  constructor() { }
 
   getBestSelector(rs: Range | Selection): Selector {
     if (rs instanceof Range) {
@@ -81,18 +77,32 @@ export class Annotator {
     return annotation;
   }
 
-  highlightRange(range: Range) {
+  highlightRange(range: Range, tag: string) {
     for (const subRange of this.getSubRanges(range)) {
-      const newNode = document.createElement("span");
-      newNode.setAttribute('style', 'background-color: yellow;');
+      const newNode = document.createElement(tag);
       subRange.surroundContents(newNode);
     }
   }
 
-  annotate(rs: Range | Selection) {
+  annotate(rs: Range | Selection, tag = 'span') {
     let selector = this.getBestSelector(rs);
-    this.createAnnotation(selector.selection);
-    this.highlightRange(selector.range);
+    const annotation = this.createAnnotation(selector.selection);
+    this.highlightRange(selector.range, tag);
+    return annotation;
+  }
+
+  remove(node: Node) {
+    var parent = node.parentNode;
+    while (node.firstChild) {
+      const child = node.firstChild;
+      if (child.nodeType == Node.TEXT_NODE) {
+        parent.insertBefore(child, node);
+      } else {
+        node.removeChild(child);
+      }
+    }
+    parent.removeChild(node);
+    parent.normalize();
   }
 
 }
