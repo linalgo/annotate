@@ -17,12 +17,16 @@ export class XPathSelector extends Selector {
   rangeFromSelection(selection: XPathSelection): Range {
     this.selection = selection
     let range = document.createRange();
-    var { node, offset } = findOriginalNodeAndOffset(selection.startContainer, selection.startOffset);
-    range.setStart(node, offset);
-    var { node, offset } = findOriginalNodeAndOffset(selection.endContainer, selection.endOffset);
-    range.setEnd(node, offset);
-    this.range = range;
-    return this.range;
+    try {
+      var { node, offset } = findOriginalNodeAndOffset(selection.startContainer, selection.startOffset);
+      range.setStart(node, offset);
+      var { node, offset } = findOriginalNodeAndOffset(selection.endContainer, selection.endOffset);
+      range.setEnd(node, offset);
+      this.range = range;
+      return this.range;
+    } catch(e) {
+      throw new Error(`Could not find node with selection ${selection}`);
+    }
   }
 }
 
@@ -75,6 +79,7 @@ function findOriginalNodeAndOffset(path: string, offset: number) {
       newOffset += node.nodeValue.length;
     }
   }
+  throw new Error('Could not find node');
 }
 
 function getNormalizedOffset(node: Node, offset: number, ignoreNodeName: string): number {
