@@ -1,4 +1,4 @@
-import { Selection, XPathSelection } from './selection';
+import { XPathSelection } from './selection';
 import { Selector } from './selector'
 
 export class XPathSelector extends Selector {
@@ -6,10 +6,10 @@ export class XPathSelector extends Selector {
   selectionFromRange(range: Range): XPathSelection {
     this.range = range;
     this.selection = {
-      startContainer: getPathTo(range.startContainer),
-      endContainer: getPathTo(range.endContainer),
-      startOffset: range.startOffset,
-      endOffset: range.endOffset
+      startContainer: getPathTo(range.startContainer, document, this.ignoreNodeName),
+      endContainer: getPathTo(range.endContainer, document, this.ignoreNodeName),
+      startOffset: getNormalizedOffset(range.startContainer, range.startOffset, this.ignoreNodeName),
+      endOffset: getNormalizedOffset(range.endContainer, range.endOffset, this.ignoreNodeName)
     }
     return this.selection;
   }
@@ -17,17 +17,16 @@ export class XPathSelector extends Selector {
   rangeFromSelection(selection: XPathSelection): Range {
     this.selection = selection
     let range = document.createRange();
-    range.setStart(findNode(selection.startContainer), selection.startOffset);
-    range.setEnd(findNode(selection.endContainer), selection.endOffset);
+    var { node, offset } = findOriginalNodeAndOffset(selection.startContainer, selection.startOffset);
+    range.setStart(node, offset);
+    var { node, offset } = findOriginalNodeAndOffset(selection.endContainer, selection.endOffset);
+    range.setEnd(node, offset);
     this.range = range;
     return this.range;
   }
 }
 
 function nodeName(node: Node): string {
-  if (node.nodeType === Node.TEXT_NODE) {
-    return 'text()';
-  }
   return node.nodeName.replace('#', '').toLowerCase();
 }
 
@@ -42,13 +41,56 @@ function nodePosition(node: Node): number {
   return position;
 }
 
-function getPathTo(node: Node, fromNode: Node = document): string {
+function getTextNodes(node: Node) {
+  let textNodes: Node[] = [];
+  if (node.nodeType === Node.TEXT_NODE) {
+    textNodes.push(node);
+  }
+  for (let child of node.childNodes as any) {
+    if (!(child.className === "material-icons back-arrow")) {
+      textNodes = textNodes.concat(getTextNodes(child));
+    }
+  }
+  return textNodes;
+}
+
+function getPathTo(node: Node, fromNode: Node, ignoreNodeName: string) {
   let path = '';
   while (node !== fromNode) {
-    path = `/${nodeName(node)}[${nodePosition(node)}]${path}`;
+    if (node.nodeType != Node.TEXT_NODE && nodeName(node) !== ignoreNodeName) {
+      path = `/${nodeName(node)}[${nodePosition(node)}]${path}`;
+    }
     node = node.parentNode;
   }
   return `/${path}`;
+}
+
+function findOriginalNodeAndOffset(path: string, offset: number) {
+  const container = findNode(path);
+  let newOffset = 0
+  for (const node of getTextNodes(container)) {
+    if (newOffset + node.nodeValue.length >= offset) {
+      return { node: node, offset: offset - newOffset };
+    } else {
+      newOffset += node.nodeValue.length;
+    }
+  }
+}
+
+function getNormalizedOffset(node: Node, offset: number, ignoreNodeName: string): number {
+  let parentNode = node.parentNode;
+  while (parentNode.nodeType == node.TEXT_NODE || nodeName(parentNode) == ignoreNodeName) {
+    parentNode = node.parentNode;
+  }
+  let newOffset = 0;
+  for (const child of getTextNodes(parentNode)) {
+    if (child === node) {
+      return newOffset + offset;
+    } else {
+      newOffset += child.nodeValue.length;
+    }
+  }
+  return newOffset;
 }
 
 function findNode(path: string): Node {

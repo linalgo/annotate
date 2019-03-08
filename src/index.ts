@@ -9,10 +9,10 @@ export * from './selectors';
 //   range = selection.getRangeAt(0);
 // });
 
-// const annotator = new Annotator();
-// annotator.annotate({ "startContainer": "//html[1]/body[1]/annotate[1]/p[1]/text()[3]", "endContainer": "//html[1]/body[1]/annotate[1]/p[1]/text()[3]", "startOffset": 20, "endOffset": 29 });
+// const annotator = new Annotator('b');
 // function highlight(range: Range) {
-//   const annotation = annotator.annotate(range, 'span');
+//   const annotation = annotator.createAnnotation(range);
+//   annotator.showAnnotation(annotation);
 //   console.log(JSON.stringify(annotation));
 // }
 

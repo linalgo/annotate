@@ -1,27 +1,13 @@
-import { Selection, Selector, isXPathSelection, isTextPositionSelection } from '../selectors'
-import { TextPositionSelector } from '../selectors';
-import { XPathSelector } from '../selectors/xpath-selector';
+import { Selection, SelectorFactory } from '../selectors'
 
 import { Annotation } from './annotation';
 
 
 export class Annotator {
 
-  annotations: Array<Annotation> = [];
+  nodeMap: Node[][] = [];
 
-  constructor() { }
-
-  getBestSelector(rs: Range | Selection): Selector {
-    if (rs instanceof Range) {
-      return new XPathSelector(rs);
-    } else if (isXPathSelection(rs)) {
-      return new XPathSelector(rs);
-    } else if (isTextPositionSelection(rs)) {
-      return new TextPositionSelector(rs);
-    } else {
-      throw new Error('Range or Selection only.')
-    }
-  }
+  constructor(private tag: string) { }
 
   getTextNodes(node: Node) {
     const textNodes = [];
@@ -32,7 +18,7 @@ export class Annotator {
         textNodes.push(node)
       }
       if (node.childNodes.length > 0) {
-        for (const child of node.childNodes) {
+        for (const child of node.childNodes as any) {
           children.push(child);
         }
       }
@@ -64,45 +50,51 @@ export class Annotator {
     return ranges;
   }
 
-  createAnnotation(selection: Selection): Annotation {
+  createAnnotation(rs: Range | Selection): Annotation {
+    let selector = SelectorFactory.getBestSelector(rs, this.tag);
     const annotation = {
-      type: '',
-      body: '',
+      type: 'Annotation',
+      body: {},
       target: {
         source: document.URL,
-        selector: [selection]
+        selector: [selector.selection]
       }
     }
-    this.annotations.push(annotation);
     return annotation;
   }
 
-  highlightRange(range: Range, tag: string) {
+  showAnnotation(annotation: Annotation) {
+    const selection = annotation.target.selector[0];
+    const selector = SelectorFactory.getBestSelector(selection, this.tag);
+    const range = selector.rangeFromSelection(selection);
+    const newNodes: Node[] = [];
+    annotation.nodeMapIndex = this.nodeMap.length;
+    this.nodeMap.push([]);
     for (const subRange of this.getSubRanges(range)) {
-      const newNode = document.createElement(tag);
+      const newNode = document.createElement(this.tag);
+      (newNode as any).annotation = annotation;
       subRange.surroundContents(newNode);
+      newNodes.push(newNode);
+      this.nodeMap[annotation.nodeMapIndex].push(newNode);
     }
+    range.commonAncestorContainer.normalize();
+    return newNodes;
   }
 
-  annotate(rs: Range | Selection, tag = 'span') {
-    let selector = this.getBestSelector(rs);
-    const annotation = this.createAnnotation(selector.selection);
-    this.highlightRange(selector.range, tag);
-    return annotation;
-  }
-
-  remove(node: Node) {
-    var parent = node.parentNode;
-    while (node.firstChild) {
-      const child = node.firstChild;
-      if (child.nodeType == Node.TEXT_NODE) {
-        parent.insertBefore(child, node);
-      } else {
-        node.removeChild(child);
+  hideAnnotation(annotation: Annotation) {
+    for (const node of this.nodeMap[annotation.nodeMapIndex]) {
+      var parent = node.parentNode;
+      while (node.firstChild) {
+        const child = node.firstChild;
+        if (child.nodeType == Node.TEXT_NODE) {
+          parent.insertBefore(child, node);
+        } else {
+          node.removeChild(child);
+        }
       }
+      parent.removeChild(node);
+      parent.normalize();
     }
-    parent.removeChild(node);
-    parent.normalize();
   }
 
 }
