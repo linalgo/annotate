@@ -1,22 +1,22 @@
 {
-  "name": "annotate-core",
-  "version": "0.0.2",
+  "name": "@linalgo/annotate-core",
+  "version": "0.0.1",
   "description": "A library for html document annotations following W3C standards.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "private": false,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "serve": "webpack-dev-server --open",
-    "watch": "webpack --watch"
+    "watch": "webpack --watch",
+    "package": "npm pack"
   },
   "keywords": [
     "annotation",
     "W3C"
   ],
   "author": "arnaud@linalgo.com",
-  "license": "ISC",
+  "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
     "webpack": "^4.0.1",
     "webpack-cli": "^3.1.1",
@@ -25,5 +25,13 @@
   "dependencies": {
     "ts-loader": "^4.2.0",
     "typescript": "^2.8.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/linalgo/annotate-core.git"
+  },
+  "bugs": {
+    "url": "https://github.com/linalgo/annotate-core/issues"
+  },
+  "homepage": "https://github.com/linalgo/annotate-core#readme"
 }
