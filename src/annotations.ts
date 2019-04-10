@@ -2,7 +2,7 @@ import { Annotation } from './annotators';
 
 export const annotations: Array<Annotation> = [
   {
-    id: 0,
+    id: '0',
     type: 'highlight',
     body: '',
     target: {
@@ -27,7 +27,7 @@ export const annotations: Array<Annotation> = [
       ]
     }
   }, {
-    id: 1,
+    id: '1',
     type: 'highlight',
     body: '',
     target: {

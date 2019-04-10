@@ -54,7 +54,7 @@ export class Annotator {
     let selector = SelectorFactory.getBestSelector(rs, this.tag);
     const annotation = {
       type: 'Annotation',
-      body: {},
+      body: "",
       target: {
         source: document.URL,
         selector: [selector.selection]

@@ -1,11 +1,11 @@
 import { Selection } from '../selectors';
 
 export interface Annotation {
-  id?: number
+  id?: string
   nodeMapIndex?: number;
-  uri?: string;
-  entity?: number;
-  task?: number;
+  document?: string;
+  entity?: string;
+  task?: string;
   type: string;
   body: any;
   target: {
