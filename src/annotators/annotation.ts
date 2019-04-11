@@ -6,7 +6,6 @@ export interface Annotation {
   document?: string;
   entity?: string;
   task?: string;
-  type: string;
   body: any;
   target: {
     source: string;

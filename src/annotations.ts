@@ -3,7 +3,6 @@ import { Annotation } from './annotators';
 export const annotations: Array<Annotation> = [
   {
     id: '0',
-    type: 'highlight',
     body: '',
     target: {
       source: 'http://localhost:8081/',
@@ -28,7 +27,6 @@ export const annotations: Array<Annotation> = [
     }
   }, {
     id: '1',
-    type: 'highlight',
     body: '',
     target: {
       source: 'http://localhost:8081/',

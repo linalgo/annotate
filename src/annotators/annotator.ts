@@ -50,13 +50,15 @@ export class Annotator {
     return ranges;
   }
 
-  createAnnotation(rs: Range | Selection): Annotation {
+  createAnnotation(rs: Range | Selection, task: string, entity: string, document: string): Annotation {
     let selector = SelectorFactory.getBestSelector(rs, this.tag);
     const annotation = {
-      type: 'Annotation',
       body: "",
+      task: task,
+      entity: entity,
+      document: document,
       target: {
-        source: document.URL,
+        source: document,
         selector: [selector.selection]
       }
     }
