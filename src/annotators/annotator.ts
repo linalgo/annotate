@@ -1,11 +1,12 @@
+import * as uuid from 'uuid';
+
 import { Selection, SelectorFactory } from '../selectors'
-
 import { Annotation } from './annotation';
-
 
 export class Annotator {
 
-  nodeMap: Node[][] = [];
+  annotationMap: { [id: string]: Annotation } = {};
+  nodeMap: { [id: string]: Node[] } = {};
 
   constructor(private tag: string) { }
 
@@ -50,10 +51,14 @@ export class Annotator {
     return ranges;
   }
 
-  createAnnotation(rs: Range | Selection, task: string, entity: string, document: string): Annotation {
+  createAnnotation(rs: Range | Selection, task: string, entity: string, document: string, body: string = null): Annotation {
     let selector = SelectorFactory.getBestSelector(rs, this.tag);
+    if (!body) {
+      body = rs.toString();
+    }
     const annotation = {
-      body: "",
+      id: uuid.v4(),
+      body: body,
       task: task,
       entity: entity,
       document: document,
@@ -62,6 +67,7 @@ export class Annotator {
         selector: [selector.selection]
       }
     }
+    this.annotationMap[annotation.id] = annotation;
     return annotation;
   }
 
@@ -70,21 +76,19 @@ export class Annotator {
     const selector = SelectorFactory.getBestSelector(selection, this.tag);
     const range = selector.rangeFromSelection(selection);
     const newNodes: Node[] = [];
-    annotation.nodeMapIndex = this.nodeMap.length;
-    this.nodeMap.push([]);
     for (const subRange of this.getSubRanges(range)) {
       const newNode = document.createElement(this.tag);
-      (newNode as any).annotation = annotation;
+      newNode.setAttribute('annotation', annotation.id);
       subRange.surroundContents(newNode);
       newNodes.push(newNode);
-      this.nodeMap[annotation.nodeMapIndex].push(newNode);
     }
+    this.nodeMap[annotation.id] = newNodes;
     range.commonAncestorContainer.normalize();
     return newNodes;
   }
 
-  hideAnnotation(annotation: Annotation) {
-    for (const node of this.nodeMap[annotation.nodeMapIndex]) {
+  hideAnnotation(annotationId: string) {
+    for (const node of this.nodeMap[annotationId]) {
       var parent = node.parentNode;
       while (node.firstChild) {
         const child = node.firstChild;
