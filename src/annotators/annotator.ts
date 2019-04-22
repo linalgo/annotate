@@ -83,6 +83,9 @@ export class Annotator {
       newNodes.push(newNode);
     }
     this.nodeMap[annotation.id] = newNodes;
+    if (!this.annotationMap[annotation.id]) {
+      this.annotationMap[annotation.id] = annotation;
+    }
     range.commonAncestorContainer.normalize();
     return newNodes;
   }
