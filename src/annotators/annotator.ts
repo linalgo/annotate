@@ -8,7 +8,7 @@ export class Annotator {
   annotationMap: { [id: string]: Annotation } = {};
   nodeMap: { [id: string]: Node[] } = {};
 
-  constructor(private tag: string) { }
+  constructor(private rootNode: Node = document, private tag: string = 'span') { }
 
   getTextNodes(node: Node) {
     const textNodes = [];
@@ -52,7 +52,7 @@ export class Annotator {
   }
 
   createAnnotation(rs: Range | Selection, task: string, entity: string, document: string, body: string = null): Annotation {
-    let selector = SelectorFactory.getBestSelector(rs, this.tag);
+    let selector = SelectorFactory.getBestSelector(rs, this.rootNode, this.tag);
     if (!body) {
       body = rs.toString();
     }
@@ -73,8 +73,8 @@ export class Annotator {
 
   showAnnotation(annotation: Annotation) {
     const selection = annotation.target.selector[0];
-    const selector = SelectorFactory.getBestSelector(selection, this.tag);
-    const range = selector.rangeFromSelection(selection);
+    const selector = SelectorFactory.getBestSelector(selection, this.rootNode, this.tag);
+    const range = selector.range;
     const newNodes: Node[] = [];
     for (const subRange of this.getSubRanges(range)) {
       const newNode = document.createElement(this.tag);
