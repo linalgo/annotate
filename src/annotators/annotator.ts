@@ -10,6 +10,10 @@ export class Annotator {
 
   constructor(private rootNode: Node = document, private tag: string = 'span') { }
 
+  setRoot(rootNode: Node) {
+    this.rootNode = rootNode;
+  }
+
   getTextNodes(node: Node) {
     const textNodes = [];
     const children = [node];
