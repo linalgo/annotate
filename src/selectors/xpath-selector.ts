@@ -3,24 +3,24 @@ import { Selector } from './selector'
 
 export class XPathSelector extends Selector {
 
-  selectionFromRange(range: Range): XPathSelection {
+  selectionFromRange(range: Range, rootNode: Node = document): XPathSelection {
     this.range = range;
     this.selection = {
-      startContainer: getPathTo(range.startContainer, document, this.ignoreNodeName),
-      endContainer: getPathTo(range.endContainer, document, this.ignoreNodeName),
+      startContainer: getPathTo(range.startContainer, rootNode, this.ignoreNodeName),
+      endContainer: getPathTo(range.endContainer, rootNode, this.ignoreNodeName),
       startOffset: getNormalizedOffset(range.startContainer, range.startOffset, this.ignoreNodeName),
       endOffset: getNormalizedOffset(range.endContainer, range.endOffset, this.ignoreNodeName)
     }
     return this.selection;
   }
 
-  rangeFromSelection(selection: XPathSelection): Range {
+  rangeFromSelection(selection: XPathSelection, rootNode: Node = document): Range {
     this.selection = selection
     let range = document.createRange();
     try {
-      var { node, offset } = findOriginalNodeAndOffset(selection.startContainer, selection.startOffset);
+      var { node, offset } = findOriginalNodeAndOffset(selection.startContainer, selection.startOffset, rootNode, this.ignoreNodeName);
       range.setStart(node, offset);
-      var { node, offset } = findOriginalNodeAndOffset(selection.endContainer, selection.endOffset);
+      var { node, offset } = findOriginalNodeAndOffset(selection.endContainer, selection.endOffset, rootNode, this.ignoreNodeName);
       range.setEnd(node, offset);
       this.range = range;
       return this.range;
@@ -60,7 +60,7 @@ function getTextNodes(node: Node) {
 
 function getPathTo(node: Node, fromNode: Node, ignoreNodeName: string) {
   let path = '';
-  while (node !== fromNode) {
+  while (!node.isSameNode(fromNode)) {
     if (node.nodeType != Node.TEXT_NODE && nodeName(node) !== ignoreNodeName) {
       path = `/${nodeName(node)}[${nodePosition(node)}]${path}`;
     }
@@ -69,8 +69,8 @@ function getPathTo(node: Node, fromNode: Node, ignoreNodeName: string) {
   return `/${path}`;
 }
 
-function findOriginalNodeAndOffset(path: string, offset: number) {
-  const container = findNode(path);
+function findOriginalNodeAndOffset(path: string, offset: number, rootNode: Node, ignoreNodeName: string) {
+  const container = findNode(path, rootNode, ignoreNodeName);
   let newOffset = 0
   for (const node of getTextNodes(container)) {
     if (newOffset + node.nodeValue.length >= offset) {
@@ -98,7 +98,9 @@ function getNormalizedOffset(node: Node, offset: number, ignoreNodeName: string)
   return newOffset;
 }
 
-function findNode(path: string): Node {
-  let query = document.evaluate(path, document, null, XPathResult.ANY_UNORDERED_NODE_TYPE, null)
+function findNode(path: string, rootNode: Node = document, ignoreNodeName: string): Node {
+  const prefix = getPathTo(rootNode, document, ignoreNodeName);
+  let newPath = prefix.concat(path.slice(1, path.length));
+  let query = document.evaluate(newPath, rootNode, null, XPathResult.ANY_UNORDERED_NODE_TYPE, null)
   return query.singleNodeValue
 }

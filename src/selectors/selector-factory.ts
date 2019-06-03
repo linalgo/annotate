@@ -5,13 +5,13 @@ import { TextPositionSelector } from "./text-position-selector";
 
 export class SelectorFactory {
 
-  static getBestSelector(rs: Range | Selection, ignoreNodeName: string): Selector {
+  static getBestSelector(rs: Range | Selection, rootNode: Node = document, ignoreNodeName: string): Selector {
     if (rs instanceof Range) {
-      return new XPathSelector(rs, ignoreNodeName);
+      return new XPathSelector(rs, rootNode, ignoreNodeName);
     } else if (isXPathSelection(rs)) {
-      return new XPathSelector(rs, ignoreNodeName);
+      return new XPathSelector(rs, rootNode, ignoreNodeName);
     } else if (isTextPositionSelection(rs)) {
-      return new TextPositionSelector(rs, ignoreNodeName);
+      return new TextPositionSelector(rs, rootNode, ignoreNodeName);
     } else {
       throw new Error('Range or Selection only.')
     }

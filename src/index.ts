@@ -9,9 +9,9 @@ export * from './selectors';
 //   range = selection.getRangeAt(0);
 // });
 
-// const annotator = new Annotator('b');
+// const annotator = new Annotator(document, 'b');
 // function highlight(range: Range) {
-//   const annotation = annotator.createAnnotation(range);
+//   const annotation = annotator.createAnnotation(range, 'test', 'test', document.URL, 'test');
 //   annotator.showAnnotation(annotation);
 //   console.log(JSON.stringify(annotation));
 // }

@@ -17,3 +17,14 @@ export interface Annotation {
 export function isAnnotation(obj: any): obj is Annotation {
   return obj.type && obj.target;
 }
+
+export interface AnnotationType {
+  id?: string;
+  title?: string;
+  description?: string;
+  color?: string;
+  icon_name?: string;
+  type_name?: string;
+  flashcard_type?: string;
+  action?: string;
+}

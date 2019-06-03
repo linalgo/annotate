@@ -1,14 +1,27 @@
 import * as uuid from 'uuid';
 
 import { Selection, SelectorFactory } from '../selectors'
-import { Annotation } from './annotation';
+import { Annotation, AnnotationType } from './annotation';
 
 export class Annotator {
 
+  schema: AnnotationType[];
+  colorSchema: { [id: string]: string } = {};
   annotationMap: { [id: string]: Annotation } = {};
   nodeMap: { [id: string]: Node[] } = {};
 
-  constructor(private tag: string) { }
+  constructor(private rootNode: Node = document, private tag: string = 'span') { }
+
+  setRoot(rootNode: Node) {
+    this.rootNode = rootNode;
+  }
+
+  setSchema(schema: AnnotationType[]) {
+    this.schema = schema;
+    for (const entity of this.schema) {
+      this.colorSchema[entity.id] = entity.color;
+    }
+  }
 
   getTextNodes(node: Node) {
     const textNodes = [];
@@ -52,7 +65,7 @@ export class Annotator {
   }
 
   createAnnotation(rs: Range | Selection, task: string, entity: string, document: string, body: string = null): Annotation {
-    let selector = SelectorFactory.getBestSelector(rs, this.tag);
+    let selector = SelectorFactory.getBestSelector(rs, this.rootNode, this.tag);
     if (!body) {
       body = rs.toString();
     }
@@ -73,12 +86,13 @@ export class Annotator {
 
   showAnnotation(annotation: Annotation) {
     const selection = annotation.target.selector[0];
-    const selector = SelectorFactory.getBestSelector(selection, this.tag);
-    const range = selector.rangeFromSelection(selection);
+    const selector = SelectorFactory.getBestSelector(selection, this.rootNode, this.tag);
+    const range = selector.range;
     const newNodes: Node[] = [];
     for (const subRange of this.getSubRanges(range)) {
       const newNode = document.createElement(this.tag);
       newNode.setAttribute('annotation', annotation.id);
+      newNode.style.backgroundColor = `#${this.colorSchema[annotation.entity]}`;
       subRange.surroundContents(newNode);
       newNodes.push(newNode);
     }
