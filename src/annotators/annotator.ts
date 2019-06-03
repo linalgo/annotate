@@ -1,10 +1,12 @@
 import * as uuid from 'uuid';
 
 import { Selection, SelectorFactory } from '../selectors'
-import { Annotation } from './annotation';
+import { Annotation, AnnotationType } from './annotation';
 
 export class Annotator {
 
+  schema: AnnotationType[];
+  colorSchema: { [id: string]: string } = {};
   annotationMap: { [id: string]: Annotation } = {};
   nodeMap: { [id: string]: Node[] } = {};
 
@@ -12,6 +14,13 @@ export class Annotator {
 
   setRoot(rootNode: Node) {
     this.rootNode = rootNode;
+  }
+
+  setSchema(schema: AnnotationType[]) {
+    this.schema = schema;
+    for (const entity of this.schema) {
+      this.colorSchema[entity.id] = entity.color;
+    }
   }
 
   getTextNodes(node: Node) {
@@ -83,6 +92,7 @@ export class Annotator {
     for (const subRange of this.getSubRanges(range)) {
       const newNode = document.createElement(this.tag);
       newNode.setAttribute('annotation', annotation.id);
+      newNode.style.backgroundColor = `#${this.colorSchema[annotation.entity]}`;
       subRange.surroundContents(newNode);
       newNodes.push(newNode);
     }
