@@ -1,6 +1,6 @@
 import * as uuid from 'uuid';
 
-import { Selection, SelectorFactory } from '../selectors'
+import { Selection, SelectorFactory, Selector } from '../selectors'
 import { Annotation, AnnotationType } from './annotation';
 
 export class Annotator {
@@ -64,8 +64,19 @@ export class Annotator {
     return ranges;
   }
 
-  createAnnotation(rs: Range | Selection, task: string, entity: string, document: string, body: string = null): Annotation {
-    let selector = SelectorFactory.getBestSelector(rs, this.rootNode, this.tag);
+  createAnnotation(
+    rs: Range | Selection,
+    task: string,
+    entity: string,
+    document: string,
+    body: string = null
+  ): Annotation {
+    let selector: Selector;
+    if (rs) {
+      selector = SelectorFactory.getBestSelector(rs, this.rootNode, this.tag);
+    } else {
+      selector = { selection: {} } as Selector;
+    }
     if (!body) {
       body = rs.toString();
     }

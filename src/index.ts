@@ -15,6 +15,7 @@ export * from './selectors';
 //   annotator.showAnnotation(annotation);
 //   console.log(JSON.stringify(annotation));
 // }
-
+// (window as any).annotator = annotator;
+// console.log(annotator)
 // let btn = document.getElementById('button');
 // btn.addEventListener('click', (e: Event) => highlight(range));
