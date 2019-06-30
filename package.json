@@ -1,6 +1,6 @@
 {
   "name": "@linalgo/annotate-core",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "A library for html document annotations following W3C standards.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

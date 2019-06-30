@@ -22,21 +22,21 @@ export interface TextQuoteSelection {
 export type Selection = XPathSelection | TextPositionSelection | TextQuoteSelection;
 
 export function isXPathSelection(obj: any): obj is XPathSelection {
-  if (obj.startContainer && obj.endContainer && obj.startOffset && obj.endOffset) {
+  if ('startContainer' in obj && 'endContainer' in obj && 'startOffset' in obj && 'endOffset' in obj) {
     return true;
   }
   return false;
 }
 
 export function isTextPositionSelection(obj: any): obj is TextPositionSelection {
-  if (obj.start && obj.end) {
+  if ('start' in obj && 'end' in obj) {
     return true;
   }
   return false;
 }
 
 export function isTectQuoteSelection(obj: any): obj is TextQuoteSelection {
-  if (obj.exact && obj.prefix && obj.suffix) {
+  if ('exact' in obj && 'prefix' in obj && 'suffix' in obj) {
     return true;
   }
   return false;
