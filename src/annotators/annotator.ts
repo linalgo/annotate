@@ -103,7 +103,8 @@ export class Annotator {
     for (const subRange of this.getSubRanges(range)) {
       const newNode = document.createElement(this.tag);
       newNode.setAttribute('annotation', annotation.id);
-      newNode.style.backgroundColor = `#${this.colorSchema[annotation.entity]}`;
+      newNode.setAttribute('entity', annotation.entity);
+      // newNode.setAttribute('color', `#${this.colorSchema[annotation.entity]}`);
       subRange.surroundContents(newNode);
       newNodes.push(newNode);
     }
