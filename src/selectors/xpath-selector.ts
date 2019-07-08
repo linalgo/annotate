@@ -51,7 +51,7 @@ function getTextNodes(node: Node) {
     textNodes.push(node);
   }
   for (let child of node.childNodes as any) {
-    if (!(child.className === "material-icons back-arrow")) {
+    if (!(child.className && child.className.includes('linpop-ignore'))) {
       textNodes = textNodes.concat(getTextNodes(child));
     }
   }
