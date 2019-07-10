@@ -5,6 +5,10 @@ export class XPathSelector extends Selector {
 
   selectionFromRange(range: Range, rootNode: Node = document): XPathSelection {
     this.range = range;
+    const startContainer = getPathTo(range.startContainer, rootNode, this.ignoreNodeName)
+    const endContainer = getPathTo(range.endContainer, rootNode, this.ignoreNodeName)
+    const startOffset = getNormalizedOffset(range.startContainer, range.startOffset, this.ignoreNodeName)
+    const endOffset = getNormalizedOffset(range.endContainer, range.endOffset, this.ignoreNodeName)
     this.selection = {
       startContainer: getPathTo(range.startContainer, rootNode, this.ignoreNodeName),
       endContainer: getPathTo(range.endContainer, rootNode, this.ignoreNodeName),
@@ -24,7 +28,7 @@ export class XPathSelector extends Selector {
       range.setEnd(node, offset);
       this.range = range;
       return this.range;
-    } catch(e) {
+    } catch (e) {
       throw new Error(`Could not find node with selection ${selection}`);
     }
   }
@@ -61,8 +65,10 @@ function getTextNodes(node: Node) {
 function getPathTo(node: Node, fromNode: Node, ignoreNodeName: string) {
   let path = '';
   while (!node.isSameNode(fromNode)) {
-    if (node.nodeType != Node.TEXT_NODE && nodeName(node) !== ignoreNodeName) {
-      path = `/${nodeName(node)}[${nodePosition(node)}]${path}`;
+    if (node.nodeType != Node.TEXT_NODE) {
+      if (nodeName(node) !== ignoreNodeName) {
+        path = `/${nodeName(node)}[${nodePosition(node)}]${path}`;
+      }
     }
     node = node.parentNode;
   }
@@ -83,9 +89,9 @@ function findOriginalNodeAndOffset(path: string, offset: number, rootNode: Node,
 }
 
 function getNormalizedOffset(node: Node, offset: number, ignoreNodeName: string): number {
-  let parentNode = node.parentNode;
+  let parentNode = node;
   while (parentNode.nodeType == node.TEXT_NODE || nodeName(parentNode) == ignoreNodeName) {
-    parentNode = node.parentNode;
+    parentNode = parentNode.parentNode;
   }
   let newOffset = 0;
   for (const child of getTextNodes(parentNode)) {
