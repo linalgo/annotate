@@ -19,7 +19,15 @@ export interface TextQuoteSelection {
   suffix: string;
 }
 
-export type Selection = XPathSelection | TextPositionSelection | TextQuoteSelection;
+export interface BoundingBoxSelection {
+  type?: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export type Selection = XPathSelection | TextPositionSelection | TextQuoteSelection | BoundingBoxSelection;
 
 export function isXPathSelection(obj: any): obj is XPathSelection {
   if ('startContainer' in obj && 'endContainer' in obj && 'startOffset' in obj && 'endOffset' in obj) {
