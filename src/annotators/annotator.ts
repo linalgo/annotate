@@ -1,6 +1,6 @@
 import * as uuid from 'uuid';
 
-import { Selection, SelectorFactory, Selector } from '../selectors'
+import { Selection, SelectorFactory, Selector, isSelection } from '../selectors'
 import { Annotation, AnnotationType } from './annotation';
 
 export class Annotator {
@@ -78,6 +78,9 @@ export class Annotator {
       selector = { selection: {} } as Selector;
     }
     if (!body) {
+      if (isSelection(rs)) {
+        rs = selector.rangeFromSelection(rs, this.rootNode);
+      }
       body = rs.toString();
     }
     const annotation = {
@@ -121,7 +124,7 @@ export class Annotator {
       var parent = node.parentNode;
       while (node.firstChild) {
         const child = node.firstChild;
-        if (child.nodeType == Node.TEXT_NODE) {
+        if (child.nodeType == Node.TEXT_NODE || child.nodeName.toLowerCase() == this.tag) {
           parent.insertBefore(child, node);
         } else {
           node.removeChild(child);
